@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+def buildVersionCode = project.hasProperty("devBuild") ? 100 :
+    new Date().format("yyMMddHHmm").toInteger()
+
+android {
+
+  compileSdkVersion Build.compileSdkVersion
+  defaultConfig {
+    applicationId Build.appId
+    buildToolsVersion Build.buildToolsVersion
+    minSdkVersion Build.minSdkVersion
+    targetSdkVersion Build.targetSdkVersion
+    compileSdkVersion Build.compileSdkVersion
+    versionCode buildVersionCode
+    versionName "2.0"
+    vectorDrawables.useSupportLibrary = true
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    manifestPlaceholders = [appName: "@string/app_name"]
+  }
+  buildTypes {
+    release {
+      minifyEnabled true
+      shrinkResources true
+      multiDexEnabled true
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+    debug {
+      manifestPlaceholders = [appName: "Biedra - Debug"]
+      debuggable true
+      multiDexEnabled true
+      minifyEnabled false
+    }
+  }
+  lintOptions {
+    abortOnError false
+  }
+  if (project.hasProperty('devBuild')) {
+    splits.abi.enable = false
+    splits.density.enable = false
+    aaptOptions.cruncherEnabled = false
+  }
+  dexOptions {
+    preDexLibraries = true
+  }
+}
+
+dependencies {
+  implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+  implementation External.kotlin
+  //  Support
+  implementation Support.appcompat
+  implementation Support.constraint
+  implementation Support.recyclerView
+  implementation Support.design
+  implementation Support.constraint
+  //  Logging
+  implementation External.timber
+  //  RX
+  implementation External.rxjava2
+  implementation External.rxbinding
+  implementation External.rxkotlin
+}
